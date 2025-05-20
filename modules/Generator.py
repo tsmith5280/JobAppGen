@@ -12,7 +12,11 @@ use_placeholder = os.getenv("USE_PLACEHOLDER", "false").lower() == "true"
 
 # Create OpenAI client only if needed
 if not use_placeholder:
-    client = openai.OpenAI(api_key=openai_api_key)
+   api_key = openai_api_key or os.environ.get("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OPENAI_API_KEY is not set.")
+client = openai.OpenAI(api_key=api_key)
+
 
 def generate_resume(api_key, name, email, skills, experience, model):
     if use_placeholder:

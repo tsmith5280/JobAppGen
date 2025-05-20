@@ -10,14 +10,16 @@ import io
 def export_as_pdf(text):
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
     pdf.set_font("Arial", size=12)
+    pdf.set_auto_page_break(auto=True, margin=15)
     for line in text.split("\n"):
         pdf.multi_cell(0, 10, line)
     buffer = io.BytesIO()
-    pdf.output(buffer)
+    buffer.write(pdf.output(dest='S').encode('latin1'))
     buffer.seek(0)
     return buffer
+
+
 
 def export_as_docx(text):
     doc = Document()
