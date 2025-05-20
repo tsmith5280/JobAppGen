@@ -1,0 +1,23 @@
+# Ignore Python compiled files and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore logs and temporary files
+logs/
+*.log
+*.tmp
+*.DS_Store
+
+# Ignore IDE and editor settings
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Ignore environment files
+.env
+
+# Ignore credentials or secret keys
+client_secret*.json  # Specifically for your API keys (like OpenAI)
