@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+        margin: 0;
+        font-family: sans-serif;
+    }
+    #chat-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 320px;
+        height: 420px;
+        background: #1e1e1e;
+        border: 1px solid #aaa;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1000;
+    }
+    #chat-header {
+        background: #ff4b4b;
+        padding: 12px;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+    }
+    #chat-body {
+        flex-grow: 1;
+        padding: 12px;
+        color: white;
+        overflow-y: auto;
+        font-size: 0.9rem;
+    }
+    #chat-input {
+        border: none;
+        padding: 10px;
+        font-size: 1rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <div id="chat-header">Virel 💼</div>
+    <div id="chat-body">
+      <p>Hello! How can I assist you today with your job-related needs?</p>
+    </div>
+    <input type="text" id="chat-input" placeholder="Type here..." onkeypress="handleKey(event)" />
+  </div>
+
+  <script>
+    function handleKey(e) {
+      if (e.key === "Enter") {
+        const input = document.getElementById("chat-input");
+        const message = input.value.trim();
+        if (message) {
+          const chatBody = document.getElementById("chat-body");
+          chatBody.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+          input.value = "";
+
+          fetch("http://localhost:8000/chat", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ prompt: message })
+          })
+          .then(response => response.json())
+          .then(data => {
+            chatBody.innerHTML += `<p><strong>Virel:</strong> ${data.response}</p>`;
+            chatBody.scrollTop = chatBody.scrollHeight;
+          })
+          .catch(err => {
+            chatBody.innerHTML += `<p style="color:red;"><strong>Virel:</strong> Error connecting to server.</p>`;
+          });
+        }
+      }
+    }
+  </script>
+</body>
+</html>
