@@ -17,7 +17,7 @@
   Keep a log of every job you’ve applied to, with the ability to download your data as a CSV.
 
 - 📄 **Download Options**  
-  Export your resume and cover letter in `.txt`, `.pdf`, or `.docx` formats.
+  Export your resume and cover letter in `.pdf`, or `.docx` formats.
 
 ## 🧠 Tech Stack
 

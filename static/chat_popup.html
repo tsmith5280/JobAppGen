@@ -6,28 +6,51 @@
         margin: 0;
         font-family: sans-serif;
     }
-    #chat-container {
+
+    #toggle-btn {
         position: fixed;
         bottom: 20px;
         right: 20px;
+        background-color: #ff4b4b;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 1001;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    #chat-wrapper {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
         width: 320px;
         height: 420px;
+        display: none;
+        z-index: 1000;
+    }
+
+    #chat-container {
         background: #1e1e1e;
         border: 1px solid #aaa;
         border-radius: 12px;
         box-shadow: 0 0 20px rgba(0,0,0,0.3);
         display: flex;
         flex-direction: column;
-        overflow: hidden;
-        z-index: 1000;
+        height: 100%;
     }
+
     #chat-header {
         background: #ff4b4b;
         padding: 12px;
         color: white;
         font-weight: bold;
         text-align: center;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
     }
+
     #chat-body {
         flex-grow: 1;
         padding: 12px;
@@ -35,6 +58,7 @@
         overflow-y: auto;
         font-size: 0.9rem;
     }
+
     #chat-input {
         border: none;
         padding: 10px;
@@ -45,15 +69,27 @@
   </style>
 </head>
 <body>
-  <div id="chat-container">
-    <div id="chat-header">Virel 💼</div>
-    <div id="chat-body">
-      <p>Hello! How can I assist you today with your job-related needs?</p>
+
+  <!-- Toggle button -->
+  <button id="toggle-btn" onclick="toggleChat()">💬</button>
+
+  <!-- Chat box wrapper -->
+  <div id="chat-wrapper">
+    <div id="chat-container">
+      <div id="chat-header">Virel 💼</div>
+      <div id="chat-body">
+        <p>Hello! How can I assist you today with your job-related needs?</p>
+      </div>
+      <input type="text" id="chat-input" placeholder="Type here..." onkeypress="handleKey(event)" />
     </div>
-    <input type="text" id="chat-input" placeholder="Type here..." onkeypress="handleKey(event)" />
   </div>
 
   <script>
+    function toggleChat() {
+      const chat = document.getElementById("chat-wrapper");
+      chat.style.display = (chat.style.display === "none") ? "block" : "none";
+    }
+
     function handleKey(e) {
       if (e.key === "Enter") {
         const input = document.getElementById("chat-input");
@@ -82,5 +118,6 @@
       }
     }
   </script>
+
 </body>
 </html>
