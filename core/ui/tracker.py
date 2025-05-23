@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import uuid
 from collections import defaultdict
-from utils.storage import save_applications
-from utils.data import save_applications
+from core.utils.storage import save_applications
+from core.utils.data import save_applications
 
 def tracker_section(CSV_FILE):
     if "applications" not in st.session_state:

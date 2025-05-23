@@ -1,12 +1,14 @@
 import streamlit as st
+from core.ui.auth_header import auth_header
+auth_header()
 import os
 from dotenv import load_dotenv
 import openai
 import re
-from utils.state import init_session_state
+from core.utils.state import init_session_state
 from core.coach import show_tip
 from core.match import compare_resume_to_job
-from utils.storage import persistent_input, persistent_textarea, load_profile, save_profile
+from core.utils.storage import persistent_input, persistent_textarea, load_profile, save_profile
 load_profile()
 from core.ui.resume_cover import (
     resume_section,

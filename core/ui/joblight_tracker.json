@@ -1,0 +1,23 @@
+[
+  {
+    "job_title": "Data Scientist",
+    "company": "OpenAI",
+    "status": "Applied",
+    "date": "2025-05-23",
+    "notes": "Referred by GPT-4"
+  },
+  {
+    "job_title": "Machine Learning Engineer",
+    "company": "Anthropic",
+    "status": "Interviewing",
+    "date": "2025-05-20",
+    "notes": "First round complete"
+  },
+  {
+    "job_title": "AI Researcher",
+    "company": "Google DeepMind",
+    "status": "Saved",
+    "date": "2025-05-18",
+    "notes": "Waiting to tailor resume"
+  }
+]

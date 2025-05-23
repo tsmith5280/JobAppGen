@@ -4,7 +4,7 @@ from core.export import export_as_pdf, export_as_docx
 import pandas as pd
 import uuid
 from core.ui.tracker_view import STATUS_OPTIONS
-from utils.cleaning import clean_resume_output, extract_resume_commentary
+from core.utils.cleaning import clean_resume_output, extract_resume_commentary
 
 RESUME_KEY = "resume"
 COVER_LETTER_KEY = "cover_letter"
@@ -29,12 +29,15 @@ def resume_section(name, email, skills, experience, job_title, company, model, c
                 # When ready, add format_choice as an arg to generator
             )
             comment = extract_resume_commentary(resume_text)
-            resume_text = clean_resume_output(resume_text)
+            cleaned_resume = clean_resume_output(resume_text)
+
+            st.session_state[RESUME_KEY] = cleaned_resume
+            st.session_state["resume_comment"] = comment
+
 
         if "Error" in resume_text:
             st.error(resume_text)
         else:
-            st.session_state[RESUME_KEY] = resume_text
             st.success("✅ Resume generated successfully!")
             if comment:
                 st.info(f"🧠 AI Tip: {comment}")
@@ -48,16 +51,21 @@ def resume_section(name, email, skills, experience, job_title, company, model, c
 
 def render_resume_output():
     if RESUME_KEY in st.session_state:
+        st.markdown("### 📄 Generated Resume")
         st.markdown(f"```markdown\n{st.session_state[RESUME_KEY]}\n```")
-        for fmt, func, ext in [
-            ("PDF", lambda: export_as_pdf(st.session_state[RESUME_KEY]), "pdf"),
-            ("Word", lambda: export_as_docx(st.session_state[RESUME_KEY]), "docx")
-        ]:
-            st.download_button(
-                f"Download Resume ({fmt})",
-                func(),
-                file_name=f"Resume.{ext}"
-            )
+    for fmt, func, ext in [
+        ("PDF", lambda: export_as_pdf(st.session_state[RESUME_KEY]), "pdf"),
+        ("Word", lambda: export_as_docx(st.session_state[RESUME_KEY]), "docx")
+]:
+        st.download_button(
+            f"Download Resume ({fmt})",
+            func(),
+            file_name=f"Resume.{ext}"
+    )
+
+    if st.session_state.get("resume_comment"):
+        st.markdown("### 💡 AI Commentary")
+        st.info(st.session_state["resume_comment"])
 
 def cover_letter_section(name, job_title, company, job_description, model, client, api_key, use_placeholder):
     if st.button("Generate Cover Letter"):

@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import uuid
 from collections import defaultdict
-from utils.data import save_applications
+from core.utils.data import save_applications
 STATUS_OPTIONS = ["Applied", "Interview", "Rejected", "Offer", "Generated"]
 import re
 
