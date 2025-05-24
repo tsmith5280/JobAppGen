@@ -3,7 +3,6 @@ from docx import Document
 import io
 
 def sanitize_text(text):
-    """Replace characters unsupported by latin1 for PDF export."""
     return (text.replace("‘", "'")
                 .replace("’", "'")
                 .replace("“", '"')

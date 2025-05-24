@@ -8,7 +8,6 @@ def extract_text_from_pdf(file):
     return text
 
 def basic_resume_parse(text):
-    # SUPER basic placeholder logic – just to demo structure
     lines = text.splitlines()
     parsed = {
         "full_name": lines[0] if lines else "",
@@ -17,3 +16,7 @@ def basic_resume_parse(text):
         "experience": "3+ years in analytics and modeling."
     }
     return parsed
+
+def parse_resume_file(file):
+    text = extract_text_from_pdf(file)
+    return basic_resume_parse(text)

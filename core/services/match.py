@@ -6,8 +6,7 @@ def compare_resume_to_job(api_key, resume_text, job_description, model, use_plac
         prompt = (
             "Evaluate the following resume against the job description.\n\n"
             "Return a match score out of 100, and list 2–3 key observations on how well the resume fits.\n\n"
-            f"Resume:\n{resume_text}\n\n"
-            f"Job Description:\n{job_description}"
+            f"Resume:\n{resume_text}\n\nJob Description:\n{job_description}"
         )
         response = client.chat.completions.create(
             model=model,

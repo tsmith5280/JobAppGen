@@ -1,6 +1,6 @@
 # JobAppGen
 
-**JobAppGen** is an AI-powered job application assistant that helps you generate polished resumes and cover letters, track your job applications, and compare your resume to job descriptions — all in one clean, Streamlit-based dashboard.
+**JobAppGen** is an AI-powered job application assistant that helps you generate polished resumes and cover letters, track your job applications, and compare your resume to job descriptions — all in one clean, product.
 
 ## 🚀 Features
 
@@ -21,7 +21,6 @@
 
 ## 🧠 Tech Stack
 
-- [Streamlit](https://streamlit.io/)
 - [OpenAI API](https://openai.com/)
 - [Python-dotenv](https://pypi.org/project/python-dotenv/)
 - [FPDF](https://pyfpdf.github.io/fpdf2/)

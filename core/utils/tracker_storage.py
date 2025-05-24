@@ -1,24 +1,11 @@
 import json
-import streamlit as st
 
-# Save tracker data to downloadable .json file
-def save_tracker_button(tracker_data):
-    json_string = json.dumps(tracker_data, indent=2)
-    st.download_button(
-        label="Download Tracker",
-        data=json_string,
-        file_name="joblight_tracker.json",
-        mime="application/json"
-    )
+def save_tracker_to_json(tracker_data, filepath):
+    with open(filepath, "w") as f:
+        json.dump(tracker_data, f, indent=2)
 
-# Load tracker data from uploaded .json file
-def load_tracker_upload():
-    uploaded_file = st.file_uploader("Upload Tracker (.json)", type="json")
-    if uploaded_file:
-        try:
-            tracker_data = json.load(uploaded_file)
-            st.success("Tracker loaded.")
-            return tracker_data
-        except Exception as e:
-            st.error(f"Error loading tracker: {e}")
-    return None
+def load_tracker_from_json(file):
+    try:
+        return json.load(file)
+    except Exception as e:
+        raise ValueError(f"Invalid JSON tracker: {e}")

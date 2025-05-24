@@ -1,7 +1,17 @@
-streamlit==1.20.0
-openai==1.79.0
+# --- Core Backend ---
+fastapi
+uvicorn[standard]
+
+# --- Supabase + Auth ---
+supabase
 python-dotenv
-fpdf
+
+# --- AI + Resume Logic ---
+openai==1.79.0
+PyMuPDF                # Required for fitz PDF parsing
 python-docx
-numpy==1.23.5
+fpdf
+
+# --- Data Handling ---
 pandas==1.5.3
+numpy==1.23.5

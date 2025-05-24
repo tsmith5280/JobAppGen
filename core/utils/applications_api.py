@@ -17,5 +17,4 @@ def get_user_applications(user_id):
         .eq("user_id", user_id) \
         .order("date", desc=True) \
         .execute()
-
     return response.data or []
