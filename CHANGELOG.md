@@ -7,6 +7,26 @@ All notable changes to this project will be documented in this file.
 - Planned: Matchmaking algorithm based on job and user profiles
 - Planned: Smart job recommendation UI integration
 
+## [0.2.0] - 2025-05-24
+### Added
+- Full backend restructuring under `backend/` with `core/`, `routers/`, `static/`, and environment separation
+- RESTful API routes for `/profile`, `/resume`, `/applications` via FastAPI
+- Joblight frontend scaffolded with Next.js, Tailwind CSS, and TypeScript
+- Global theme with warm amber and teal color tokens
+- Initial `dashboard.tsx` page and `Layout` component system
+- `.env` configuration handled securely in backend
+- Git hygiene enforced via improved `.gitignore` covering `.env`, build outputs, and dependency caches
+
+### Changed
+- Removed all remaining Streamlit dependencies, session logic, and UI calls
+- Migrated state/profile persistence logic from `session.py` to Supabase + REST-based calls
+- Split `main.py` into modular route handlers and helper services
+
+### Fixed
+- Corrected session-based profile fallback to dynamic user authentication
+- Resolved broken state calls in former Streamlit logic by removing `st.session_state`
+- Eliminated circular imports in `core/utils/` by flattening logic
+
 ## [0.1.0] - 2025-05-23
 ### Added
 - Initial application structure and file organization
