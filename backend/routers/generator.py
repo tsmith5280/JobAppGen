@@ -1,8 +1,6 @@
-from core.utils.auth import get_current_user
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List
-from core.services.ai_resume_writer import generate_resume_with_gpt
 
 router = APIRouter()
 
@@ -23,19 +21,33 @@ class ResumeRequest(BaseModel):
 
 @router.post("/generate_resume/")
 def generate_resume(data: ResumeRequest):
-    profile_dict = data.profile.dict()
-    target_dict = data.target.dict()
+    profile = data.profile
+    target = data.target
 
-    resume_text = generate_resume_with_gpt(profile_dict, target_dict)
+    def match_score(profile, job):
+        skills = set([s.lower() for s in profile.skills])
+        job_text = job.description.lower()
+        matched = [s for s in skills if s in job_text]
+        score = int((len(matched) / max(len(skills), 1)) * 100)
+        return score, matched
 
-    # Basic match score logic (you can keep or improve this later)
-    skills = set([s.lower() for s in profile_dict["skills"]])
-    job_text = target_dict["description"].lower()
-    matched = [s for s in skills if s in job_text]
-    score = int((len(matched) / max(len(skills), 1)) * 100)
+    score, matched = match_score(profile, target)
+
+    resume = f"""
+{profile.full_name}
+{profile.job_title}
+
+Skills: {', '.join(profile.skills)}
+
+Experience:
+{profile.experience}
+
+Targeting: {target.job_title} at {target.company}
+Job Description: {target.description}
+"""
 
     return {
-        "resume": resume_text,
+        "resume": resume.strip(),
         "score": score,
         "matched_skills": matched,
         "recommendation": "⚠️ Consider updating your profile — skill match is low." if score < 70 else ""

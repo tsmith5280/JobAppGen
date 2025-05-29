@@ -12,14 +12,12 @@ export default function Home() {
         <p className="text-center max-w-lg">
           Your AI assistant for finding jobs, building resumes, and tracking applications.
         </p>
-        <div className="mt-8">
-          <a
-            href="/dashboard"
-            className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full shadow transition"
-          >
-            Go to Dashboard
-          </a>
-        </div>
+        <a
+          href="/dashboard"
+          className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full shadow transition mt-8"
+        >
+          Go to Dashboard
+        </a>
       </main>
     </>
   );
