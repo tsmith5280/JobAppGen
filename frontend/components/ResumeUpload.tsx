@@ -7,7 +7,7 @@ type ParsedProfile = {
   experience: string;
 };
 
-export default function ResumeUpload() {
+export default function ResumeUpload({ onParsed }: { onParsed: (parsed: ParsedProfile) => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [parsed, setParsed] = useState<ParsedProfile | null>(null);
   const [status, setStatus] = useState("");
@@ -33,6 +33,7 @@ export default function ResumeUpload() {
 
     const data = await res.json();
     setParsed(data);
+    onParsed(data);
     setStatus("Parsed!");
   };
 

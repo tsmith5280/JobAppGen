@@ -4,13 +4,6 @@ import ResumeUpload from "@/components/ResumeUpload";
 import ProfileForm from "@/components/ProfileForm";
 import JobTargetForm from "@/components/JobTargetForm";
 
-const DashboardContent = () => (
-  <>
-    <h2 className="text-3xl font-bold text-amber-600 mb-4">Dashboard</h2>
-    <p>Welcome to your job search dashboard.</p>
-  </>
-);
-
 export default function Dashboard() {
   const [profile, setProfile] = useState(null);
   const [resume, setResume] = useState("");
@@ -32,9 +25,11 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="p-8 space-y-4">
-        <DashboardContent />
-        <ResumeUpload />
-        <ProfileForm onSave={setProfile} />
+        <h2 className="text-3xl font-bold text-amber-600 mb-4">Dashboard</h2>
+        <p>Welcome to your job search dashboard.</p>
+
+        <ResumeUpload onParsed={setProfile} />
+        <ProfileForm onSave={setProfile} profile={profile} />
         {profile && <JobTargetForm onGenerate={generateResume} />}
 
         {resume && (
