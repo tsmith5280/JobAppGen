@@ -1,11 +1,12 @@
 import { useState } from "react";
 
-type ParsedProfile = {
+export type ParsedProfile = {
   full_name: string;
   job_title: string;
   skills: string[];
   experience: string;
 };
+
 
 export default function ResumeUpload({ onParsed }: { onParsed: (parsed: ParsedProfile) => void }) {
   const [file, setFile] = useState<File | null>(null);

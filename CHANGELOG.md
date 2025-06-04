@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Planned: Matchmaking algorithm based on job and user profiles
 - Planned: Smart job recommendation UI integration
 
+
 ## [0.2.0] - 2025-05-24
 ### Added
 - Full backend restructuring under `backend/` with `core/`, `routers/`, `static/`, and environment separation
@@ -49,3 +50,20 @@ All notable changes to this project will be documented in this file.
 ---
 
 > 💡 Add new entries above this line as the project progresses.
+
+##0.2.1 - 2025-06-04
+### Added
+- Resume upload now connects to backend parser with parsed output shown on dashboard
+- Manual profile editing supported alongside automatic resume parsing
+- Job save functionality stores entries in `localStorage` for demo tracking
+- Toast notifications (via Sonner) added for job save confirmation
+- Dashboard displays saved job list dynamically with timestamps
+
+### Changed
+- Cleaned up `dashboard.tsx` to separate profile, resume, and job logic clearly
+- Updated `tsconfig.json` to support `@/core/*` alias resolution for shared logic
+
+### Fixed
+- Handled fetch error states for resume parsing and resume generation calls
+- Resolved `localStorage` reference crash during SSR by checking `window` existence
+
