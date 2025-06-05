@@ -1,29 +1,28 @@
 import { useState, useEffect } from "react";
-import Layout from "@/components/Layout";
 import ResumeUpload from "@/components/ResumeUpload";
 import ProfileForm from "@/components/ProfileForm";
 import JobTargetForm from "@/components/JobTargetForm";
 import ParsedResume from "@/components/ParsedResume";
+import DashboardView from "@/components/ui/DashboardView";
 import type { ParsedProfile } from "@/components/ResumeUpload";
-import type { ParsedResumeProps } from "@/components/ParsedResume";
 import type { JobEntry } from "@/core/jobs/saveJob";
 import { saveJob } from "@/core/jobs/saveJob";
 
-export default function Dashboard() {
+export default function DashboardView() {
   const [profile, setProfile] = useState<ParsedProfile | null>(null);
   const [parsedResume, setParsedResume] = useState<ParsedProfile | null>(null);
   const [generatedResume, setGeneratedResume] = useState<string>("");
   const [score, setScore] = useState<number | null>(null);
   const [recommendation, setRecommendation] = useState("");
+  const [setupComplete, setSetupComplete] = useState(false);
 
   const [savedJobs, setSavedJobs] = useState<JobEntry[]>(() => {
-  if (typeof window !== "undefined") {
-    const saved = localStorage.getItem("jobTracker");
-    return saved ? JSON.parse(saved) : [];
-  }
-  return [];
-});
-
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("jobTracker");
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
 
   useEffect(() => {
     localStorage.setItem("jobTracker", JSON.stringify(savedJobs));
@@ -48,7 +47,7 @@ export default function Dashboard() {
       followUpSent: false,
     };
 
-    setSavedJobs(prev => [...prev, newEntry]);
+    setSavedJobs((prev) => [...prev, newEntry]);
   }
 
   async function generateResume(target: any) {
@@ -64,14 +63,17 @@ export default function Dashboard() {
     setRecommendation(data.recommendation);
   }
 
+  if (setupComplete) {
+    return <DashboardView profile={profile} />;
+  }
+
   return (
     <div className="p-8 space-y-4">
-      <h2 className="text-3xl font-bold text-amber-600 mb-4">Dashboard</h2>
-      <p>Welcome to your job search dashboard.</p>
+      <h2 className="text-3xl font-bold text-amber-600 mb-4">Dashboard Setup</h2>
+      <p>Start by uploading your resume and reviewing your profile info.</p>
 
       <ResumeUpload onParsed={setParsedResume} />
       <ProfileForm onSave={setProfile} profile={profile} />
-      {profile && <JobTargetForm onGenerate={generateResume} />}
 
       {parsedResume && (
         <ParsedResume
@@ -81,6 +83,8 @@ export default function Dashboard() {
           experience={[parsedResume.experience]}
         />
       )}
+
+      {profile && <JobTargetForm onGenerate={generateResume} />}
 
       {generatedResume && (
         <div className="bg-zinc-800 text-white p-4 rounded">
@@ -110,8 +114,12 @@ export default function Dashboard() {
             </div>
           )}
 
-          {score !== null && <p>Match Score: <strong>{score}%</strong></p>}
-          {recommendation && <p className="text-red-400 italic">{recommendation}</p>}
+          <button
+            onClick={() => setSetupComplete(true)}
+            className="mt-4 bg-green-600 px-4 py-2 rounded text-white hover:bg-green-700 transition"
+          >
+            ✅ Finish Setup & Go to Dashboard
+          </button>
         </div>
       )}
     </div>
