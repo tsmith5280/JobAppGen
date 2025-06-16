@@ -7,51 +7,24 @@ All notable changes to this project will be documented in this file.
 - Planned: Matchmaking algorithm based on job and user profiles
 - Planned: Smart job recommendation UI integration
 
-
-## [0.2.0] - 2025-05-24
+## [0.3.0] - 2025-06-05
 ### Added
-- Full backend restructuring under `backend/` with `core/`, `routers/`, `static/`, and environment separation
-- RESTful API routes for `/profile`, `/resume`, `/applications` via FastAPI
-- Joblight frontend scaffolded with Next.js, Tailwind CSS, and TypeScript
-- Global theme with warm amber and teal color tokens
-- Initial `dashboard.tsx` page and `Layout` component system
-- `.env` configuration handled securely in backend
-- Git hygiene enforced via improved `.gitignore` covering `.env`, build outputs, and dependency caches
+- Live data fetching for dashboard components (`StatsOverview`, `ApplicationList`) from the FastAPI backend.
+- Centralized backend business logic into a new `core/services` directory, improving separation of concerns.
+- A flexible, per-page layout system on the frontend (`getLayout` pattern) to support distinct views for the dashboard, login, and setup pages.
 
 ### Changed
-- Removed all remaining Streamlit dependencies, session logic, and UI calls
-- Migrated state/profile persistence logic from `session.py` to Supabase + REST-based calls
-- Split `main.py` into modular route handlers and helper services
+- **Refactored `applications` and `profile` modules to use a clean Router-Service pattern, making the API "thin" and the services "thick".**
+- **Replaced client-side `localStorage` job saving with a robust backend API call, ensuring data persistence.**
+- Reorganized all frontend components into `features/`, `layout/`, and `ui/` directories for improved maintainability and discoverability.
+- Standardized all Supabase client interactions in the backend to be consistently `async` and use dependency injection.
 
 ### Fixed
-- Corrected session-based profile fallback to dynamic user authentication
-- Resolved broken state calls in former Streamlit logic by removing `st.session_state`
-- Eliminated circular imports in `core/utils/` by flattening logic
+- Resolved multiple critical TypeScript errors related to component props and page layouts.
+- Corrected `.gitignore` to properly exclude `__pycache__`, `.env`, and other generated files from source control.
+- Removed redundant API utility files (`profile_api.py`, `applications_api.py`) after consolidating their logic into the new service layer.
 
-## [0.1.0] - 2025-05-23
-### Added
-- Initial application structure and file organization
-- User authentication via Supabase (`auth.py`, `auth_header.py`)
-- Resume upload and parsing flow (`resume_parser.py`, `main.py`, `profile_api.py`)
-- Application tracker UI and logic (`1_Tracker.py`, `applications_api.py`, `tracker_view.py`)
-- Resume & cover letter generator interface (`2_Resume_and_Cover.py`, `resume_cover.py`, `generator.py`)
-- Profile upload gating logic via dynamic user IDs
-- SQL policies for RLS: insert/view/update/delete protections for `applications` and `user_profile`
-- Foreign key relationships: `user_profile.user_id` → `auth.users.id`
-
-### Changed
-- Updated `user_profile.skills` to use `text[]` array for advanced filtering
-- Enhanced database constraints for safer cross-table integrity
-- Modularized UI with `core/ui/` and logic separation in `core/utils/`
-
-### Fixed
-- Removed fallback test `user_id` from tracker in favor of dynamic session-based ID
-
----
-
-> 💡 Add new entries above this line as the project progresses.
-
-##0.2.1 - 2025-06-04
+## [0.2.1] - 2025-06-04
 ### Added
 - Resume upload now connects to backend parser with parsed output shown on dashboard
 - Manual profile editing supported alongside automatic resume parsing
@@ -67,3 +40,9 @@ All notable changes to this project will be documented in this file.
 - Handled fetch error states for resume parsing and resume generation calls
 - Resolved `localStorage` reference crash during SSR by checking `window` existence
 
+## [0.2.0] - ...
+## [0.1.0] - ...
+
+---
+
+> 💡 Add new entries above this line as the project progresses.

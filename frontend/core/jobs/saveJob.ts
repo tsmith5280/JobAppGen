@@ -1,31 +1,36 @@
+import { SupabaseClient } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
 interface SaveJobProps {
-  title: string;
-  company: string;
-  sourceURL: string;
-  resumeVersion: string;
+  job_title: string;
+  company_name: string;
+  status?: string;
 }
 
-export interface JobEntry {
-  title: string;
-  company: string;
-  sourceURL: string;
-  resumeUsed: string;
-  appliedDate: string;
-  followUpSent: boolean;
-}
+export async function saveJobToDatabase(
+  supabase: SupabaseClient,
+  jobData: SaveJobProps
+) {
+  try {
+    const { error } = await supabase.from("applications").insert([
+      {
+        job_title: jobData.job_title,
+        company_name: jobData.company_name,
+        status: jobData.status || "Applied",
+      },
+    ]);
 
-export function saveJob({ title, company, sourceURL, resumeVersion }: SaveJobProps) {
-  const newJob: JobEntry = {
-    title,
-    company,
-    sourceURL,
-    resumeUsed: resumeVersion,
-    appliedDate: new Date().toISOString(),
-    followUpSent: false,
-  };
+    if (error) {
+      // Let the calling function know something went wrong.
+      throw error;
+    }
 
-  console.log("Saving job:", newJob);
-  toast.success("📌 Job saved! We’ll remind you to follow up.");
+    toast.success("📌 Job saved to your dashboard!");
+
+  } catch (error: any) {
+    console.error("Error saving job:", error);
+    toast.error("Failed to save job", {
+      description: error.message,
+    });
+  }
 }

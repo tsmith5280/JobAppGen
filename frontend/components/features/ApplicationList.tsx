@@ -13,35 +13,33 @@ interface Application {
   application_date: string;
 }
 
+interface ApplicationListProps {
+  refresh: boolean;
+}
+
 const getBadgeVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
   switch (status.toLowerCase()) {
-    case "interview":
-      return "default";
-    case "offer":
-      return "secondary";
-    case "rejected":
-      return "destructive";
-    case "applied":
-      return "outline";
-    default:
-      return "outline"; // Add a default return value
+    case "interview": return "default";
+    case "offer": return "secondary";
+    case "rejected": return "destructive";
+    case "applied": default: return "outline";
   }
 };
 
 const formatDate = (dateString: string) => {
-    // ... (formatDate function remains the same)
+  return new Date(dateString).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 };
 
-const ApplicationList = () => {
+const ApplicationList = ({ refresh }: ApplicationListProps) => {
   const supabase = useSupabaseClient();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchApplications = async () => {
+      setLoading(true);
       try {
         const { data, error } = await supabase.functions.invoke("api/applications/");
-
         if (error) throw error;
         setApplications(data || []);
       } catch (error) {
@@ -52,38 +50,53 @@ const ApplicationList = () => {
     };
 
     fetchApplications();
-  }, [supabase]);
+  }, [supabase, refresh]);
 
   if (loading) {
-    return <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Recent Applications</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Skeleton loaders */}
-            {[...Array(4)].map((_, i) => (
-                <Card key={i} className="animate-pulse"><div className="h-48 bg-muted rounded-lg"></div></Card>
-            ))}
-        </div>
-    </div>;
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i} className="animate-pulse">
+            <div className="h-48 bg-muted rounded-lg"></div>
+          </Card>
+        ))}
+      </div>
+    );
   }
 
   return (
-    <div className="mt-8">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Recent Applications</h2>
-        <Button variant="ghost">View all</Button>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {applications.length > 0 ? applications.map((app) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {applications.length > 0 ? (
+        applications.map((app) => (
           <Card key={app.id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-4 flex flex-col justify-between h-full">
-              {/* ... Card content JSX remains the same, but now uses live data ... */}
-              {/* Example: <h3 ...>{app.job_title}</h3> */}
+              <div>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-semibold text-foreground pr-2">{app.job_title}</h3>
+                  <Badge variant={getBadgeVariant(app.status)}>{app.status}</Badge>
+                </div>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <div className="flex items-center">
+                    <Building size={14} className="mr-2" />
+                    <span>{app.company_name}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar size={14} className="mr-2" />
+                    <span>{formatDate(app.application_date)}</span>
+                  </div>
+                </div>
+              </div>
+              <Button variant="secondary" size="sm" className="w-full mt-4">
+                View Details
+              </Button>
             </CardContent>
           </Card>
-        )) : (
-          <p className="text-muted-foreground col-span-full">You haven't added any applications yet. Get started!</p>
-        )}
-      </div>
+        ))
+      ) : (
+        <p className="text-muted-foreground col-span-full text-center py-8">
+          You haven't added any applications yet.
+        </p>
+      )}
     </div>
   );
 };

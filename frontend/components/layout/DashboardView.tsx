@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import Sidebar from "./Sidebar";
-import StatsOverview from "./features/StatsOverview";
-import ApplicationList from "./features/ApplicationList";
-import SmartAssistantCard from "./SmartAssistantCard";
+import StatsOverview from "../features/StatsOverview";
+import ApplicationList from "../features/ApplicationList";
+import SmartAssistantCard from "../features/SmartAssistantCard";
 import type { ParsedProfile } from "@/components/features/ResumeUpload";
 
 type Props = {
