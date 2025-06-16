@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import List
 from datetime import datetime
-from core.utils.supabase_client import get_supabase_client, Supabase # THIS LINE IS CHANGED
+
+from ..core.utils.supabase_client import get_supabase_client, Supabase
+from ..core.services import application_service
 
 router = APIRouter(
     prefix="/applications",
@@ -22,46 +24,28 @@ class ApplicationStats(BaseModel):
     offers: int
 
 @router.get("/", response_model=List[Application])
-async def get_recent_applications(
-    supabase: Supabase = Depends(get_supabase_client)
-):
-    """
-    Fetches the 4 most recent applications for the authenticated user
-    to display on the dashboard.
-    """
-    user = (await supabase.auth.get_user()).user # Use await for async client
+async def get_applications_route(supabase: Supabase = Depends(get_supabase_client)):
+    user = (await supabase.auth.get_user()).user
     if not user:
-        return [] # Or raise HTTPException
+        raise HTTPException(status_code=401, detail="Not authenticated")
     
-    response = (
-        supabase.from_("applications")
-        .select("id, job_title, company_name, status, application_date")
-        .eq("user_id", user.id)
-        .order("application_date", desc=True)
-        .limit(4) # Fetching 4 for a 2x2 grid layout
-        .execute()
-    )
-    return response.data
+    return await application_service.get_recent_applications(supabase, user.id)
 
 @router.get("/stats", response_model=ApplicationStats)
-async def get_application_stats(
+async def get_stats_route(supabase: Supabase = Depends(get_supabase_client)):
+    user = (await supabase.auth.get_user()).user
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    return await application_service.get_application_stats(supabase, user.id)
+
+@router.post("/", response_model=Application, status_code=201)
+async def create_application_route(
+    application_data: application_service.ApplicationCreate,
     supabase: Supabase = Depends(get_supabase_client)
 ):
-    """
-    Fetches aggregate application statistics for the authenticated user.
-    """
-    user = (await supabase.auth.get_user()).user # Use await for async client
+    user = (await supabase.auth.get_user()).user
     if not user:
-        return ApplicationStats(applications_sent=0, interviews=0, offers=0)
+        raise HTTPException(status_code=401, detail="Not authenticated")
 
-    # Supabase returns the count in a different way for different versions.
-    # We will perform individual queries for robustness.
-    sent_count_res = supabase.from_("applications").select("id", count="exact").eq("user_id", user.id).execute()
-    interview_count_res = supabase.from_("applications").select("id", count="exact").eq("user_id", user.id).eq("status", "Interview").execute()
-    offer_count_res = supabase.from_("applications").select("id", count="exact").eq("user_id", user.id).eq("status", "Offer").execute()
-
-    return {
-        "applications_sent": sent_count_res.count or 0,
-        "interviews": interview_count_res.count or 0,
-        "offers": offer_count_res.count or 0,
-    }
+    return await application_service.create_application(supabase, user.id, application_data)

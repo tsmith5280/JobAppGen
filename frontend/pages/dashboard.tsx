@@ -1,9 +1,9 @@
 import { useUser, useSupabaseClient, User } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import { useEffect, useState, ReactElement } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
-import StatsOverview from "@/components/StatsOverview";
-import ApplicationList from "@/components/ApplicationList";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import StatsOverview from "@/components/features/StatsOverview";
+import ApplicationList from "@/components/features/ApplicationList";
 import { NextPageWithLayout } from "./_app";
 
 interface Profile {

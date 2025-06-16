@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
 import ApplicationForm from "@/components/ApplicationForm";
-import ApplicationList from "@/components/ApplicationList";
+import ApplicationList from "@/components/features/ApplicationList";
 
 export default function ApplicationsPage() {
   const [refresh, setRefresh] = useState(false);

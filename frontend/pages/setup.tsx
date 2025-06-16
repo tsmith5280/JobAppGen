@@ -3,8 +3,8 @@ import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import ResumeUpload from "@/components/ResumeUpload";
-import ProfileForm from "@/components/ProfileForm";
+import ResumeUpload from "@/components/features/ResumeUpload";
+import ProfileForm from "@/components/features/ProfileForm";
 
 export default function SetupPage() {
   const supabase = useSupabaseClient();

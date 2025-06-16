@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import Sidebar from "./Sidebar";
-import StatsOverview from "./StatsOverview";
-import ApplicationList from "./ApplicationList";
+import StatsOverview from "./features/StatsOverview";
+import ApplicationList from "./features/ApplicationList";
 import SmartAssistantCard from "./SmartAssistantCard";
-import type { ParsedProfile } from "@/components/ResumeUpload";
+import type { ParsedProfile } from "@/components/features/ResumeUpload";
 
 type Props = {
   profile: ParsedProfile | null;
