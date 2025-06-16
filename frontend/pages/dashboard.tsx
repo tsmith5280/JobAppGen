@@ -1,127 +1,76 @@
-import { useState, useEffect } from "react";
-import ResumeUpload from "@/components/ResumeUpload";
-import ProfileForm from "@/components/ProfileForm";
-import JobTargetForm from "@/components/JobTargetForm";
-import ParsedResume from "@/components/ParsedResume";
-import DashboardView from "@/components/ui/DashboardView";
-import type { ParsedProfile } from "@/components/ResumeUpload";
-import type { JobEntry } from "@/core/jobs/saveJob";
-import { saveJob } from "@/core/jobs/saveJob";
+import { useUser, useSupabaseClient, User } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/router";
+import { useEffect, useState, ReactElement } from "react";
+import DashboardLayout from "@/components/DashboardLayout";
+import StatsOverview from "@/components/StatsOverview";
+import ApplicationList from "@/components/ApplicationList";
+import { NextPageWithLayout } from "./_app";
 
-export default function DashboardView() {
-  const [profile, setProfile] = useState<ParsedProfile | null>(null);
-  const [parsedResume, setParsedResume] = useState<ParsedProfile | null>(null);
-  const [generatedResume, setGeneratedResume] = useState<string>("");
-  const [score, setScore] = useState<number | null>(null);
-  const [recommendation, setRecommendation] = useState("");
-  const [setupComplete, setSetupComplete] = useState(false);
+interface Profile {
+  full_name?: string;
+  avatar_url?: string;
+  // Add any other profile properties here in the future
+}
 
-  const [savedJobs, setSavedJobs] = useState<JobEntry[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("jobTracker");
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
+interface DashboardContentProps {
+  profile: Profile;
+  user: User | null;
+}
+
+const DashboardContent = ({ profile, user }: DashboardContentProps) => {
+  return (
+    <>
+      <h1 className="text-3xl font-bold">Dashboard</h1>
+      <p className="text-muted-foreground">Welcome back, {profile.full_name || user?.email || 'User'}</p>
+      
+      <div className="mt-8 space-y-8">
+        <StatsOverview />
+        <ApplicationList />
+      </div>
+    </>
+  );
+};
+
+const DashboardPage: NextPageWithLayout = () => {
+  const supabase = useSupabaseClient();
+  const user = useUser();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
-    localStorage.setItem("jobTracker", JSON.stringify(savedJobs));
-  }, [savedJobs]);
+    if (user) {
+      const checkProfile = async () => {
+        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        if (data && data.setup_complete) {
+          setProfile(data);
+        } else {
+          router.push('/setup');
+        }
+        setLoading(false);
+      };
+      checkProfile();
+    } else if (!loading) {
+      const timer = setTimeout(() => {
+        if(!user) router.push('/login');
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [user, router, supabase, loading]);
 
-  function handleSaveJob() {
-    const mockJob = {
-      title: profile?.job_title ?? "Unknown Role",
-      company: "Unknown Company",
-      sourceURL: "https://example.com/job-posting",
-      resumeUsed: parsedResume?.full_name ?? "Unknown",
-    };
-
-    saveJob({
-      ...mockJob,
-      resumeVersion: mockJob.resumeUsed,
-    });
-
-    const newEntry: JobEntry = {
-      ...mockJob,
-      appliedDate: new Date().toISOString(),
-      followUpSent: false,
-    };
-
-    setSavedJobs((prev) => [...prev, newEntry]);
+  if (loading || !profile) {
+    return <div className="flex h-screen items-center justify-center bg-background"><p>Loading...</p></div>;
   }
+  
+  return <DashboardContent profile={profile} user={user} />;
+};
 
-  async function generateResume(target: any) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/generate_resume/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ profile, target }),
-    });
-
-    const data = await res.json();
-    setGeneratedResume(data.resume);
-    setScore(data.score);
-    setRecommendation(data.recommendation);
-  }
-
-  if (setupComplete) {
-    return <DashboardView profile={profile} />;
-  }
-
+DashboardPage.getLayout = function getLayout(page: ReactElement) {
   return (
-    <div className="p-8 space-y-4">
-      <h2 className="text-3xl font-bold text-amber-600 mb-4">Dashboard Setup</h2>
-      <p>Start by uploading your resume and reviewing your profile info.</p>
-
-      <ResumeUpload onParsed={setParsedResume} />
-      <ProfileForm onSave={setProfile} profile={profile} />
-
-      {parsedResume && (
-        <ParsedResume
-          name={parsedResume.full_name}
-          jobTitle={parsedResume.job_title}
-          skills={parsedResume.skills}
-          experience={[parsedResume.experience]}
-        />
-      )}
-
-      {profile && <JobTargetForm onGenerate={generateResume} />}
-
-      {generatedResume && (
-        <div className="bg-zinc-800 text-white p-4 rounded">
-          <h2 className="text-lg font-semibold">Generated Resume</h2>
-          <pre>{generatedResume}</pre>
-          <p className="mt-2 text-sm">📩 Save this job for reminders later?</p>
-          <button
-            onClick={handleSaveJob}
-            className="mt-1 bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600 transition"
-          >
-            Save Job
-          </button>
-
-          {savedJobs.length > 0 && (
-            <div className="mt-6 bg-zinc-900 p-4 rounded border border-zinc-700">
-              <h3 className="text-lg font-semibold mb-2 text-teal-400">Saved Jobs</h3>
-              <ul className="list-disc list-inside space-y-1 text-sm">
-                {savedJobs.map((job, i) => (
-                  <li key={i}>
-                    <strong>{job.title}</strong> at {job.company} —{" "}
-                    <span className="text-zinc-400">
-                      {new Date(job.appliedDate).toLocaleDateString()}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <button
-            onClick={() => setSetupComplete(true)}
-            className="mt-4 bg-green-600 px-4 py-2 rounded text-white hover:bg-green-700 transition"
-          >
-            ✅ Finish Setup & Go to Dashboard
-          </button>
-        </div>
-      )}
-    </div>
+    <DashboardLayout profile={(page.props as DashboardContentProps).profile}>
+      {page}
+    </DashboardLayout>
   );
-}
+};
+
+export default DashboardPage;

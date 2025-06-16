@@ -1,118 +1,72 @@
-import React, { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { BriefcaseIcon, CalendarIcon, CheckCircleIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Briefcase, Calendar, CheckCircle } from "lucide-react";
 
-interface StatsCardProps {
-  title: string;
-  count: number;
-  icon: React.ReactNode;
-  bgColor: string;
-  microcopy: string[];
+interface StatData {
+  applications_sent: number;
+  interviews: number;
+  offers: number;
 }
 
-const StatsCard = ({
-  title,
-  count,
-  icon,
-  bgColor = "bg-teal-50",
-  microcopy = ["Keep going!"],
-}: StatsCardProps) => {
-  const [currentMicrocopy, setCurrentMicrocopy] = useState(microcopy[0]);
-  const [animate, setAnimate] = useState(false);
+const StatsOverview = () => {
+  const supabase = useSupabaseClient();
+  const [stats, setStats] = useState<StatData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (microcopy.length > 1) {
-      const interval = setInterval(() => {
-        setAnimate(true);
-        setTimeout(() => {
-          setCurrentMicrocopy(
-            microcopy[Math.floor(Math.random() * microcopy.length)],
-          );
-          setAnimate(false);
-        }, 200);
-      }, 5000);
+    const fetchStats = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("api/applications/stats");
 
-      return () => clearInterval(interval);
-    }
-  }, [microcopy]);
+        if (error) throw error;
+        setStats(data);
+      } catch (error) {
+        console.error("Error fetching application stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, [supabase]);
+
+  const statItems = [
+    { title: "Applications Sent", value: stats?.applications_sent, icon: Briefcase, iconClass: "text-blue-500" },
+    { title: "Interviews", value: stats?.interviews, icon: Calendar, iconClass: "text-purple-500" },
+    { title: "Offers Received", value: stats?.offers, icon: CheckCircle, iconClass: "text-green-500" },
+  ];
+
+  if (loading) {
+    return <div className="grid gap-4 md:grid-cols-3">
+        {/* Skeleton loaders for a better UX */}
+        {[...Array(3)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <div className="h-4 bg-muted rounded w-2/3"></div>
+                    <div className="h-4 w-4 bg-muted rounded-full"></div>
+                </CardHeader>
+                <CardContent><div className="h-8 bg-muted rounded w-1/3"></div></CardContent>
+            </Card>
+        ))}
+    </div>;
+  }
 
   return (
-    <Card className="rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 border-0">
-      <CardContent className={`${bgColor} p-6 rounded-2xl`}>
-        <div className="flex items-center space-x-4">
-          <div className="bg-white/70 p-3 rounded-full shadow-sm">{icon}</div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-            <h3 className="text-3xl font-light text-gray-800 mb-2">{count}</h3>
-            <p
-              className={`text-xs font-medium text-gray-500 transition-all duration-200 ${animate ? "opacity-0 transform translate-y-1" : "opacity-100 transform translate-y-0"}`}
-            >
-              {currentMicrocopy}
-            </p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-interface StatsOverviewProps {
-  applicationsSent?: number;
-  interviewsScheduled?: number;
-  offersReceived?: number;
-}
-
-const StatsOverview = ({
-  applicationsSent = 24,
-  interviewsScheduled = 8,
-  offersReceived = 2,
-}: StatsOverviewProps) => {
-  const applicationsMicrocopy = [
-    "Keep going!",
-    "You're on fire!",
-    "Great momentum!",
-    "Stay consistent!",
-  ];
-
-  const interviewsMicrocopy = [
-    "You're crushing it!",
-    "Impressive progress!",
-    "Keep it up!",
-    "You've got this!",
-  ];
-
-  const offersMicrocopy = [
-    "Amazing progress!",
-    "Outstanding work!",
-    "Success is yours!",
-    "Incredible achievement!",
-  ];
-
-  return (
-    <div className="bg-white w-full">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatsCard
-          title="Applications Sent"
-          count={applicationsSent}
-          icon={<BriefcaseIcon className="h-6 w-6 text-teal-500" />}
-          bgColor="bg-gradient-to-br from-teal-50 to-teal-100"
-          microcopy={applicationsMicrocopy}
-        />
-        <StatsCard
-          title="Interviews Scheduled"
-          count={interviewsScheduled}
-          icon={<CalendarIcon className="h-6 w-6 text-purple-500" />}
-          bgColor="bg-gradient-to-br from-purple-50 to-lavender-100"
-          microcopy={interviewsMicrocopy}
-        />
-        <StatsCard
-          title="Offers Received"
-          count={offersReceived}
-          icon={<CheckCircleIcon className="h-6 w-6 text-emerald-500" />}
-          bgColor="bg-gradient-to-br from-emerald-50 to-mint-100"
-          microcopy={offersMicrocopy}
-        />
-      </div>
+    <div className="grid gap-4 md:grid-cols-3">
+      {statItems.map((item) => (
+        <Card key={item.title} className="hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {item.title}
+            </CardTitle>
+            <item.icon className={`h-4 w-4 ${item.iconClass}`} />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{item.value ?? 0}</div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };

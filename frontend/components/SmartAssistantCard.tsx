@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 interface SmartAssistantCardProps {
   messages?: string[];
   onDismiss?: () => void;
+  onAction?: (message: string) => void;
+  onRemindLater?: (message: string) => void;
 }
 
 const SmartAssistantCard = ({
@@ -19,6 +21,8 @@ const SmartAssistantCard = ({
     "Your interview with DataCorp is tomorrow!",
   ],
   onDismiss = () => {},
+  onAction = () => {},
+  onRemindLater = () => {},
 }: SmartAssistantCardProps) => {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
@@ -32,7 +36,6 @@ const SmartAssistantCard = ({
         setAnimate(false);
       }, 300);
     }, 4000);
-
     return () => clearInterval(interval);
   }, [messages.length]);
 
@@ -50,7 +53,6 @@ const SmartAssistantCard = ({
       <Card className="w-80 bg-gradient-to-br from-teal-50 to-amber-50 border-teal-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
         <CardContent className="p-4">
           <div className="flex items-start space-x-3">
-            {/* Avatar */}
             <div className="relative">
               <Avatar className="h-10 w-10 ring-2 ring-teal-200 ring-offset-2">
                 <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=assistant&backgroundColor=teal" />
@@ -58,15 +60,11 @@ const SmartAssistantCard = ({
                   <MessageCircle className="h-5 w-5" />
                 </AvatarFallback>
               </Avatar>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-teal-400 rounded-full animate-pulse"></div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-teal-400 rounded-full animate-pulse" />
             </div>
-
-            {/* Message Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
-                <h4 className="text-sm font-semibold text-teal-800">
-                  Smart Assistant
-                </h4>
+                <h4 className="text-sm font-semibold text-teal-800">Smart Assistant</h4>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -76,29 +74,31 @@ const SmartAssistantCard = ({
                   <X className="h-3 w-3" />
                 </Button>
               </div>
-
               <div className="relative overflow-hidden">
                 <p
-                  className={`text-sm text-teal-700 transition-all duration-300 ${animate ? "opacity-0 transform translate-y-2" : "opacity-100 transform translate-y-0"}`}
+                  className={`text-sm text-teal-700 transition-all duration-300 ${
+                    animate ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
+                  }`}
                 >
                   {messages[currentMessageIndex]}
                 </p>
               </div>
             </div>
           </div>
-
-          {/* Action Buttons */}
           <div className="flex justify-end space-x-2 mt-3 pt-3 border-t border-teal-100">
             <Button
               variant="outline"
               size="sm"
+              onClick={() => onRemindLater?.(messages[currentMessageIndex])}
               className="text-xs border-teal-200 text-teal-700 hover:bg-teal-50 hover:border-teal-300"
             >
               Remind Later
             </Button>
             <Button
+              variant="default"
               size="sm"
-              className="text-xs bg-teal-600 hover:bg-teal-700 text-white"
+              onClick={() => onAction?.(messages[currentMessageIndex])}
+              className="text-xs"
             >
               Take Action
             </Button>

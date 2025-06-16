@@ -4,10 +4,15 @@ import Sidebar from "./Sidebar";
 import StatsOverview from "./StatsOverview";
 import ApplicationList from "./ApplicationList";
 import SmartAssistantCard from "./SmartAssistantCard";
+import type { ParsedProfile } from "@/components/ResumeUpload";
 
-export default function Home() {
-  const userName = "Alex"; // This would typically come from user authentication
+type Props = {
+  profile: ParsedProfile | null;
+};
+
+export default function DashboardView({ profile }: Props) {
   const [showAssistant, setShowAssistant] = useState(true);
+  const userName = profile?.full_name || "Guest";
 
   return (
     <div className="flex h-screen bg-background">
